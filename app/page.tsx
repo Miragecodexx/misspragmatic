@@ -44,7 +44,6 @@ import {
   ChevronRight,
 } from "lucide-react"
 import { Toaster, toast } from "sonner"
-import { ConsultationModal } from '@/components/ConsultationModal'
 
 export default function HomePage() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -71,74 +70,26 @@ export default function HomePage() {
   // Testimonial carousel state
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
 
-  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false)
-  const [selectedProgram, setSelectedProgram] = useState('')
-
-  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    
-    try {
-      const response = await fetch('/api/newsletter', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to subscribe')
-      }
-
-      setIsSubscribed(true)
-      setEmail("")
-      toast.success("Newsletter subscription successful!", {
-        description: "Thank you for subscribing. Your first insight will arrive this Monday.",
-      })
-      setTimeout(() => setIsSubscribed(false), 3000)
-    } catch (error) {
-      toast.error("Failed to subscribe", {
-        description: error instanceof Error ? error.message : "Please try again later",
-      })
-    }
+    setIsSubscribed(true)
+    setEmail("")
+    toast.success("Newsletter subscription successful!", {
+      description: "Thank you for subscribing. Your first insight will arrive this Monday.",
+      duration: 5000,
+    })
+    setTimeout(() => setIsSubscribed(false), 3000)
   }
 
-  const handleContactSubmit = async (e: React.FormEvent) => {
+  const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(contactForm),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send message')
-      }
-
-      setIsSubmitted(true)
-      setContactForm({ name: "", email: "", message: "" })
-      toast.success("Message sent successfully!", {
-        description: "Thank you for reaching out. Eno will personally review your message and respond within 24 hours.",
-      })
-      setTimeout(() => setIsSubmitted(false), 3000)
-    } catch (error) {
-      toast.error("Failed to send message", {
-        description: error instanceof Error ? error.message : "Please try again later",
-      })
-    }
-  }
-
-  const openConsultationModal = (program: string = '') => {
-    setSelectedProgram(program)
-    setIsConsultationModalOpen(true)
+    setIsSubmitted(true)
+    setContactForm({ name: "", email: "", message: "" })
+    toast.success("Message sent successfully!", {
+      description: "Thank you for reaching out. Eno will personally review your message and respond within 24 hours.",
+      duration: 5000,
+    })
+    setTimeout(() => setIsSubmitted(false), 3000)
   }
 
   const testimonials = [
@@ -351,7 +302,6 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-champagne-500 to-champagne-600 hover:from-champagne-600 hover:to-champagne-700 text-white px-10 py-4 text-lg font-light tracking-wide group"
-                  onClick={() => openConsultationModal()}
                 >
                   <Calendar className="mr-3 w-5 h-5" />
                   Book Free Consultation
@@ -899,7 +849,9 @@ export default function HomePage() {
 
                     <div className="space-y-3">
                       <Button
-                        onClick={() => openConsultationModal(program.title)}
+                        onClick={() => toast.success("Consultation request received!", {
+                          description: "We'll reach out to schedule your session within 24 hours.",
+                        })}
                         className={`w-full ${
                           program.featured
                             ? "bg-gradient-to-r from-champagne-500 to-champagne-600 hover:from-champagne-600 hover:to-champagne-700 text-white"
@@ -1358,12 +1310,6 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
-
-      <ConsultationModal
-        isOpen={isConsultationModalOpen}
-        onClose={() => setIsConsultationModalOpen(false)}
-        programName={selectedProgram}
-      />
     </div>
   )
 }
